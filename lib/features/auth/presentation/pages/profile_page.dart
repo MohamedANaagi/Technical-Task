@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/theme_cubit.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -99,12 +100,26 @@ class ProfilePage extends StatelessWidget {
                       trailing: const Icon(Icons.chevron_right_rounded),
                       onTap: () {},
                     ),
-                    _SettingsTile(
-                      icon: Icons.dark_mode_outlined,
-                      title: 'Dark Mode',
-                      subtitle: 'System default',
-                      trailing: const Icon(Icons.chevron_right_rounded),
-                      onTap: () {},
+                    BlocBuilder<ThemeCubit, ThemeMode>(
+                      builder: (context, themeMode) {
+                        final isDark = themeMode == ThemeMode.dark;
+                        return _SettingsTile(
+                          icon: isDark
+                              ? Icons.dark_mode_rounded
+                              : Icons.light_mode_rounded,
+                          title: 'Dark Mode',
+                          subtitle: isDark ? 'On' : 'Off',
+                          trailing: Switch.adaptive(
+                            value: isDark,
+                            onChanged: (value) {
+                              context.read<ThemeCubit>().setThemeMode(
+                                    value ? ThemeMode.dark : ThemeMode.light,
+                                  );
+                            },
+                          ),
+                          onTap: null,
+                        );
+                      },
                     ),
                   ],
                 ),

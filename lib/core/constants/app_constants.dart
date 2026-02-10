@@ -12,4 +12,5 @@ abstract final class AppConstants {
   static const int productsPageSize = 10;
   static const int connectTimeoutSeconds = 15;
   static const int receiveTimeoutSeconds = 15;
+  static const String themeModeKey = 'theme_mode';
 }

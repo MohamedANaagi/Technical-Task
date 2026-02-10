@@ -6,6 +6,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../env/app_env.dart';
 import '../network/dio_client.dart';
+import '../theme/theme_cubit.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource.dart';
 import '../../features/auth/data/datasources/auth_remote_datasource_impl.dart';
 import '../../features/auth/data/datasources/auth_local_datasource.dart';
@@ -53,6 +54,7 @@ Future<void> initInjection() async {
   );
   sl.registerLazySingleton<Dio>(() => sl<DioClient>().dio);
   sl.registerLazySingleton<Connectivity>(() => Connectivity());
+  sl.registerLazySingleton<ThemeCubit>(() => ThemeCubit(sl()));
 
   // Auth
   sl.registerLazySingleton<AuthRemoteDataSource>(

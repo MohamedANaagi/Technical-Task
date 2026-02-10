@@ -1,161 +1,161 @@
 # Technica Task – Flutter E-Commerce App
 
-تطبيق Flutter متكامل لعرض المنتجات وشرائها، مبني بمعمارية Clean Architecture مع إدارة الحالة بـ Cubit، دعم Offline، وتصميم Material 3 عصري.
+A production-ready Flutter e-commerce application built with Clean Architecture, Cubit state management, offline support, and a modern Material 3 UI.
 
 ---
 
-## المحتويات
+## Table of Contents
 
-- [المميزات](#المميزات)
-- [المعمارية (Architecture)](#المعمارية-architecture)
-- [هيكل المشروع](#هيكل-المشروع)
-- [إدارة الحالة (State Management)](#إدارة-الحالة-state-management)
-- [التقنيات المستخدمة (Tech Stack)](#التقنيات-المستخدمة-tech-stack)
-- [التصميم والواجهة (UI/UX)](#التصميم-والواجهة-uiux)
-- [نظام الـ Flavors](#نظام-الـ-flavors)
-- [طريقة التشغيل](#طريقة-التشغيل)
-- [بيانات الديمو](#بيانات-الديمو)
-- [الاختبارات (Testing)](#الاختبارات-testing)
-- [التعامل مع الأخطاء (Error Handling)](#التعامل-مع-الأخطاء-error-handling)
-
----
-
-## المميزات
-
-### تسجيل الدخول (Authentication)
-- تسجيل دخول بـ اسم المستخدم وكلمة المرور عبر [Fake Store API](https://fakestoreapi.com)
-- حساب ديمو محلي (`mohamed` / `0000`) يعمل بدون API
-- حفظ التوكن بشكل آمن باستخدام `flutter_secure_storage`
-- تسجيل دخول تلقائي عند فتح التطبيق (إذا كان التوكن محفوظ)
-- تسجيل خروج مع حوار تأكيد
-
-### المنتجات (Products)
-- عرض قائمة المنتجات من [Fake Store API](https://fakestoreapi.com/products) في شبكة (Grid)
-- صور المنتجات مع تخزين مؤقت (cached_network_image)
-- بحث فوري بالاسم أو التصنيف
-- تحميل تدريجي (Pagination / Lazy Loading)
-- سحب لتحديث البيانات (Pull-to-Refresh)
-- حالات عرض: تحميل (Shimmer)، فارغ، خطأ، بدون اتصال
-
-### تفاصيل المنتج (Product Detail)
-- شاشة تفاصيل كاملة مع صورة كبيرة قابلة للتوسع (SliverAppBar)
-- Hero Animation للصورة عند الانتقال
-- عرض السعر والتقييم والوصف
-- شريط سفلي ثابت مع زر "أضف للسلة"
-
-### المفضلة (Favorites)
-- إضافة/إزالة من المفضلة بضغطة واحدة مع أنيميشن
-- حفظ محلي دائم (SharedPreferences)
-- صفحة مفضلة مع سحب لحذف (Swipe to Remove)
-
-### السلة (Cart)
-- إضافة منتجات للسلة من أي مكان
-- تحكم بالكمية (+/-)
-- سحب لحذف (Swipe to Delete)
-- شريط سفلي يعرض المجموع الكلي مع زر Checkout
-- Badge على أيقونة السلة يعرض عدد العناصر
-
-### دعم Offline
-- تخزين مؤقت لقائمة المنتجات مع صلاحية (24 ساعة)
-- عند عدم الاتصال: يعرض البيانات المحفوظة مع بانر "Showing cached data"
-- معالجة أخطاء الشبكة بشكل واضح
+- [Features](#features)
+- [Architecture](#architecture)
+- [Project Structure](#project-structure)
+- [State Management](#state-management)
+- [Tech Stack](#tech-stack)
+- [UI / UX](#ui--ux)
+- [App Flavors](#app-flavors)
+- [Getting Started](#getting-started)
+- [Demo Credentials](#demo-credentials)
+- [Testing](#testing)
+- [Error Handling](#error-handling)
+- [Dependency Injection](#dependency-injection)
 
 ---
 
-## المعمارية (Architecture)
+## Features
 
-المشروع مبني بـ **Clean Architecture** بتقسيم حسب الميزات (Feature-based):
+### Authentication
+- Login with username & password via [Fake Store API](https://fakestoreapi.com)
+- Local demo account (`mohamed` / `0000`) that works without an API call
+- Secure token storage using `flutter_secure_storage`
+- Auto-login on app launch if a valid token is stored
+- Logout with a confirmation dialog
+
+### Products
+- Product listing from [Fake Store API](https://fakestoreapi.com/products) displayed in a grid
+- Image caching with `cached_network_image`
+- Instant search by product name or category
+- Pagination / lazy loading
+- Pull-to-refresh
+- UI states: shimmer loading, empty, error, offline
+
+### Product Detail
+- Full detail screen with an expandable image (SliverAppBar)
+- Hero animation for product images
+- Price, rating, and description display
+- Sticky bottom bar with "Add to Cart" button
+
+### Favorites
+- Add/remove favorites with a single tap and animated heart icon
+- Persistent local storage (SharedPreferences)
+- Favorites page with swipe-to-remove
+
+### Cart
+- Add products to cart from anywhere in the app
+- Quantity controls (+/-)
+- Swipe-to-delete items
+- Sticky bottom bar showing total price and a Checkout button
+- Badge on the cart icon showing the item count
+
+### Offline Support
+- Product list cache with a 24-hour expiry
+- When offline, cached data is shown with a "Showing cached data" banner
+- Clear error handling for network issues
+
+---
+
+## Architecture
+
+The project follows **Clean Architecture** with a feature-based structure:
 
 ```
 ┌─────────────────────────────────────────────────────┐
 │                  Presentation Layer                   │
-│          (Pages, Widgets, Cubits/States)             │
+│          (Pages, Widgets, Cubits / States)            │
 ├─────────────────────────────────────────────────────┤
 │                    Domain Layer                       │
-│         (Entities, Repository Interfaces,            │
-│                   Use Cases)                          │
+│       (Entities, Repository Interfaces, Use Cases)    │
 ├─────────────────────────────────────────────────────┤
 │                     Data Layer                        │
-│   (Repository Impl, Remote/Local Data Sources,       │
-│                    Models)                            │
+│   (Repository Impl, Remote / Local Data Sources,     │
+│                     Models)                           │
 └─────────────────────────────────────────────────────┘
 ```
 
-### كيف تعمل الطبقات معاً؟
+### How the layers work together
 
 ```
 UI (Widget) → Cubit → UseCase → Repository (interface) → DataSource
                                       ↑
                               Repository (implementation)
-                              ├── RemoteDataSource (Dio/API)
-                              └── LocalDataSource (SharedPreferences/SecureStorage)
+                              ├── RemoteDataSource (Dio / API)
+                              └── LocalDataSource (SharedPreferences / SecureStorage)
 ```
 
-**ليه Clean Architecture؟**
-- **فصل المسؤوليات**: كل طبقة ليها وظيفة واحدة واضحة
-- **سهولة الاختبار**: ممكن تعمل Mock لأي طبقة بسهولة
-- **قابلية التغيير**: تقدر تغير الـ API أو الـ Database من غير ما تأثر على الـ UI
-- **Repository Pattern**: كل الوصول للبيانات يمر من خلال Repository — الـ Domain لا يعرف مصدر البيانات
+**Why Clean Architecture?**
+- **Separation of concerns**: each layer has a single, clear responsibility
+- **Testability**: any layer can be easily mocked
+- **Flexibility**: swap the API or database without touching the UI
+- **Repository Pattern**: all data access goes through repositories — the Domain layer is agnostic of data sources
 
 ---
 
-## هيكل المشروع
+## Project Structure
 
 ```
 lib/
-├── core/                              # الكود المشترك
+├── core/                              # Shared code
 │   ├── constants/
-│   │   └── app_constants.dart         # ثوابت التطبيق (keys, timeouts, page size)
+│   │   └── app_constants.dart         # App-wide constants (keys, timeouts, page size)
 │   ├── di/
 │   │   └── injection.dart             # Dependency Injection (GetIt)
 │   ├── env/
-│   │   └── app_env.dart               # إعدادات Flavors (dev/prod)
+│   │   └── app_env.dart               # Flavor configuration (dev / prod)
 │   ├── errors/
-│   │   └── app_exceptions.dart        # أنواع الأخطاء (Server, Auth, Offline, Cache, Timeout)
+│   │   └── app_exceptions.dart        # Custom exceptions (Server, Auth, Offline, Cache, Timeout)
 │   ├── network/
-│   │   └── dio_client.dart            # Dio client مركزي (timeouts, headers, error mapping)
+│   │   └── dio_client.dart            # Centralized Dio client (timeouts, headers, error mapping)
 │   └── theme/
-│       ├── app_colors.dart            # ألوان التطبيق + Gradients
-│       └── app_theme.dart             # Light/Dark themes (Material 3 + Google Fonts)
+│       ├── app_colors.dart            # Color palette + gradients
+│       └── app_theme.dart             # Light / Dark themes (Material 3 + Google Fonts)
 │
 ├── features/
-│   ├── auth/                          # ── ميزة تسجيل الدخول ──
+│   ├── auth/                          # ── Authentication Feature ──
 │   │   ├── data/
 │   │   │   ├── datasources/
 │   │   │   │   ├── auth_remote_datasource.dart       # Interface
-│   │   │   │   ├── auth_remote_datasource_impl.dart  # تنفيذ (Dio + Demo login)
+│   │   │   │   ├── auth_remote_datasource_impl.dart  # Implementation (Dio + demo login)
 │   │   │   │   ├── auth_local_datasource.dart        # Interface
-│   │   │   │   └── auth_local_datasource_impl.dart   # تنفيذ (SecureStorage)
+│   │   │   │   └── auth_local_datasource_impl.dart   # Implementation (SecureStorage)
 │   │   │   └── repositories/
-│   │   │       └── auth_repository_impl.dart         # تنفيذ Repository
+│   │   │       └── auth_repository_impl.dart
 │   │   ├── domain/
 │   │   │   ├── entities/
 │   │   │   │   └── auth_user.dart                    # Entity: AuthUser(token)
 │   │   │   ├── repositories/
 │   │   │   │   └── auth_repository.dart              # Interface
 │   │   │   └── usecases/
-│   │   │       ├── login_usecase.dart                # تسجيل الدخول
-│   │   │       ├── logout_usecase.dart               # تسجيل الخروج
-│   │   │       └── check_auth_usecase.dart           # فحص التوكن المحفوظ
+│   │   │       ├── login_usecase.dart
+│   │   │       ├── logout_usecase.dart
+│   │   │       └── check_auth_usecase.dart
 │   │   └── presentation/
 │   │       ├── cubit/
-│   │       │   ├── auth_cubit.dart                   # إدارة حالة المصادقة
-│   │       │   └── auth_state.dart                   # الحالات: Initial, Loading, Authenticated, Unauthenticated, Error
+│   │       │   ├── auth_cubit.dart
+│   │       │   └── auth_state.dart
 │   │       ├── pages/
-│   │       │   ├── login_page.dart                   # شاشة تسجيل الدخول
-│   │       │   └── profile_page.dart                 # شاشة البروفايل والإعدادات
+│   │       │   ├── login_page.dart
+│   │       │   └── profile_page.dart
 │   │       └── widgets/
-│   │           └── login_form.dart                   # فورم تسجيل الدخول
+│   │           └── login_form.dart
 │   │
-│   ├── products/                      # ── ميزة المنتجات ──
+│   ├── products/                      # ── Products Feature ──
 │   │   ├── data/
 │   │   │   ├── datasources/
 │   │   │   │   ├── products_remote_datasource.dart
-│   │   │   │   ├── products_remote_datasource_impl.dart  # جلب من API
+│   │   │   │   ├── products_remote_datasource_impl.dart  # Fetches from API
 │   │   │   │   ├── products_local_datasource.dart
-│   │   │   │   └── products_local_datasource_impl.dart   # Cache محلي
+│   │   │   │   └── products_local_datasource_impl.dart   # Local cache
 │   │   │   ├── models/
-│   │   │   │   └── product_model.dart                    # Model: JSON ↔ Entity
+│   │   │   │   └── product_model.dart                    # JSON ↔ Entity mapping
 │   │   │   └── repositories/
 │   │   │       └── products_repository_impl.dart         # Cache-first strategy
 │   │   ├── domain/
@@ -167,17 +167,17 @@ lib/
 │   │   │       └── get_products_usecase.dart
 │   │   └── presentation/
 │   │       ├── cubit/
-│   │       │   ├── products_cubit.dart                   # تحميل + Pagination
-│   │       │   └── products_state.dart                   # الحالات: Loading, Loaded, Empty, Error
+│   │       │   ├── products_cubit.dart
+│   │       │   └── products_state.dart
 │   │       └── pages/
-│   │           ├── products_list_page.dart                # شبكة المنتجات + بحث
-│   │           ├── product_detail_page.dart               # تفاصيل المنتج
-│   │           ├── cart_page.dart                         # صفحة السلة
-│   │           ├── favorites_page.dart                    # صفحة المفضلة
-│   │           ├── main_shell.dart                        # Bottom Nav Bar + Tab Management
+│   │           ├── products_list_page.dart                # Product grid + search
+│   │           ├── product_detail_page.dart               # Product details
+│   │           ├── cart_page.dart                         # Cart page
+│   │           ├── favorites_page.dart                    # Favorites page
+│   │           ├── main_shell.dart                        # Bottom nav bar + tab management
 │   │           └── products_shell.dart                    # Wrapper
 │   │
-│   ├── favorites/                     # ── ميزة المفضلة ──
+│   ├── favorites/                     # ── Favorites Feature ──
 │   │   ├── data/
 │   │   │   ├── datasources/
 │   │   │   │   ├── favorites_local_datasource.dart
@@ -194,7 +194,7 @@ lib/
 │   │           ├── favorites_cubit.dart
 │   │           └── favorites_state.dart
 │   │
-│   └── cart/                          # ── ميزة السلة ──
+│   └── cart/                          # ── Cart Feature ──
 │       ├── data/
 │       │   ├── datasources/
 │       │   │   ├── cart_local_datasource.dart
@@ -211,259 +211,260 @@ lib/
 │               ├── cart_cubit.dart
 │               └── cart_state.dart                       # items: Map<productId, quantity>
 │
-├── main.dart                          # نقطة الدخول الافتراضية (prod)
-├── main_dev.dart                      # نقطة الدخول لـ dev flavor
-└── main_prod.dart                     # نقطة الدخول لـ prod flavor
+├── main.dart                          # Default entry point (prod)
+├── main_dev.dart                      # Dev flavor entry point
+└── main_prod.dart                     # Prod flavor entry point
 ```
 
 ---
 
-## إدارة الحالة (State Management)
+## State Management
 
-التطبيق يستخدم **Cubit** من مكتبة `flutter_bloc` لإدارة كل الحالات:
+The app uses **Cubit** from `flutter_bloc` for all state management:
 
 ### AuthCubit
-| الحالة | الوصف |
-|--------|-------|
-| `AuthStateInitial` | الحالة الابتدائية |
-| `AuthStateLoading` | جاري تسجيل الدخول أو فحص التوكن |
-| `AuthStateAuthenticated(user)` | المستخدم مسجل دخول (يحمل AuthUser) |
-| `AuthStateUnauthenticated` | لم يسجل دخول / تم تسجيل الخروج |
-| `AuthStateError(message)` | خطأ في تسجيل الدخول |
+| State | Description |
+|-------|-------------|
+| `AuthStateInitial` | Initial state |
+| `AuthStateLoading` | Logging in or checking stored token |
+| `AuthStateAuthenticated(user)` | User is logged in (holds AuthUser) |
+| `AuthStateUnauthenticated` | Not logged in / logged out |
+| `AuthStateError(message)` | Login error |
 
 ### ProductsCubit
-| الحالة | الوصف |
-|--------|-------|
-| `ProductsStateInitial` | الحالة الابتدائية |
-| `ProductsStateLoading` | جاري تحميل المنتجات |
-| `ProductsStateLoaded(products, hasMore, isOffline)` | تم التحميل (مع دعم Pagination و Offline) |
-| `ProductsStateEmpty` | لا توجد منتجات |
-| `ProductsStateError(message, isOffline)` | خطأ (مع تحديد إذا كان بسبب عدم الاتصال) |
+| State | Description |
+|-------|-------------|
+| `ProductsStateInitial` | Initial state |
+| `ProductsStateLoading` | Fetching products |
+| `ProductsStateLoaded(products, hasMore, isOffline)` | Loaded with pagination and offline support |
+| `ProductsStateEmpty` | No products available |
+| `ProductsStateError(message, isOffline)` | Error with offline indicator |
 
 ### FavoritesCubit
-| الحالة | الوصف |
-|--------|-------|
-| `FavoritesStateInitial` | الحالة الابتدائية |
-| `FavoritesStateLoaded(ids)` | مجموعة IDs المنتجات المفضلة |
+| State | Description |
+|-------|-------------|
+| `FavoritesStateInitial` | Initial state |
+| `FavoritesStateLoaded(ids)` | Set of favorite product IDs |
 
 ### CartCubit
-| الحالة | الوصف |
-|--------|-------|
-| `CartStateInitial` | الحالة الابتدائية |
-| `CartStateLoaded(items)` | عناصر السلة: `Map<productId, quantity>` |
+| State | Description |
+|-------|-------------|
+| `CartStateInitial` | Initial state |
+| `CartStateLoaded(items)` | Cart items as `Map<productId, quantity>` |
 
-**قواعد مهمة:**
-- الـ Cubits تستدعي Use Cases فقط (لا تعرف مصدر البيانات)
-- لا يوجد Business Logic في الـ Widgets
-- `BlocBuilder` مستخدم بشكل محدد لتجنب إعادة البناء غير الضرورية
+**Key principles:**
+- Cubits call Use Cases only (they don't know the data source)
+- No business logic in Widgets
+- `BlocBuilder` is scoped to avoid unnecessary rebuilds
 
 ---
 
-## التقنيات المستخدمة (Tech Stack)
+## Tech Stack
 
-| المكتبة | الاستخدام | الإصدار |
-|---------|-----------|---------|
-| `flutter_bloc` | إدارة الحالة (Cubit) | ^8.1.6 |
-| `equatable` | مقارنة الكائنات (States & Entities) | ^2.0.5 |
-| `dio` | HTTP Client مع error mapping | ^5.7.0 |
-| `get_it` | Dependency Injection | ^8.0.2 |
-| `flutter_secure_storage` | حفظ التوكن بشكل آمن | ^9.2.2 |
-| `shared_preferences` | حفظ المفضلة والسلة والـ Cache | ^2.3.3 |
-| `connectivity_plus` | فحص حالة الاتصال | ^6.0.5 |
-| `cached_network_image` | تخزين الصور مؤقتاً | ^3.4.1 |
-| `google_fonts` | خط Inter العصري | ^8.0.1 |
+| Package | Purpose | Version |
+|---------|---------|---------|
+| `flutter_bloc` | State management (Cubit) | ^8.1.6 |
+| `equatable` | Value equality for States & Entities | ^2.0.5 |
+| `dio` | HTTP client with error mapping | ^5.7.0 |
+| `get_it` | Dependency injection | ^8.0.2 |
+| `flutter_secure_storage` | Secure token storage | ^9.2.2 |
+| `shared_preferences` | Local storage for favorites, cart, cache | ^2.3.3 |
+| `connectivity_plus` | Network connectivity checks | ^6.0.5 |
+| `cached_network_image` | Image caching | ^3.4.1 |
+| `google_fonts` | Inter font for modern typography | ^8.0.1 |
 
-### مكتبات الاختبار
+### Dev Dependencies
 
-| المكتبة | الاستخدام | الإصدار |
-|---------|-----------|---------|
-| `flutter_test` | اختبارات Widget | SDK |
-| `bloc_test` | اختبار Cubits | ^9.1.7 |
-| `mocktail` | إنشاء Mocks | ^1.0.4 |
+| Package | Purpose | Version |
+|---------|---------|---------|
+| `flutter_test` | Widget testing | SDK |
+| `bloc_test` | Cubit testing | ^9.1.7 |
+| `mocktail` | Mock generation | ^1.0.4 |
 | `flutter_lints` | Lint rules | ^6.0.0 |
 
 ---
 
-## التصميم والواجهة (UI/UX)
+## UI / UX
 
-### نظام الثيم
-- **Material 3** مفعّل مع `ColorScheme.fromSeed`
-- دعم **Light / Dark mode** (يتبع إعدادات النظام تلقائياً)
-- خط **Google Fonts (Inter)** لطباعة عصرية ونظيفة
-- لون أساسي: `#6C5CE7` (Indigo-Violet)
+### Theme System
+- **Material 3** enabled with `ColorScheme.fromSeed`
+- **Light / Dark mode** support (follows system settings automatically)
+- **Google Fonts (Inter)** for clean, modern typography
+- Primary color: `#6C5CE7` (Indigo-Violet)
 
-### عناصر التصميم
-| العنصر | التفاصيل |
-|--------|----------|
-| **Bottom Nav Bar** | عائم (floating) مع glassmorphism blur + أنيميشن مخصصة (scale, pill indicator, icon morph) |
-| **بطاقات المنتجات** | ظلال ناعمة، صور بخلفية مميزة، زر إضافة للسلة، أنيميشن القلب |
-| **شاشة التفاصيل** | SliverAppBar قابل للتوسع، Hero animation، شريط سفلي ثابت |
-| **السلة** | Swipe-to-delete، شريط Total، أزرار كمية مصممة |
-| **المفضلة** | Swipe-to-remove، بطاقات بظلال ناعمة |
-| **البروفايل** | تصميم Settings-style مع أقسام مجمعة وأيقونات ملونة |
-| **تسجيل الدخول** | Glassmorphic card، لوجو متحرك، Fade+Slide entrance animation |
-| **Splash** | شاشة بداية بلوجو التطبيق |
-| **Shimmer Loading** | تأثير pulse أثناء تحميل المنتجات |
+### Design Elements
 
-### الأنيميشن
-- **Hero Transitions**: صور المنتجات بين القائمة والتفاصيل
-- **Scale Animation**: ضغط على أيقونات الـ Bottom Nav
-- **Pill Indicator**: مؤشر متحرك فوق التاب المختار
-- **Animated Heart**: أيقونة المفضلة تتحول بـ Scale Transition
-- **Page Transitions**: iOS-style (Cupertino) على كل المنصات
-- **Fade + Slide**: شاشة تسجيل الدخول
+| Element | Details |
+|---------|---------|
+| **Bottom Nav Bar** | Floating with glassmorphism blur + custom animations (scale, pill indicator, icon morph) |
+| **Product Cards** | Soft shadows, contained images on tinted backgrounds, "Add to Cart" button, animated heart |
+| **Detail Screen** | Expandable SliverAppBar, Hero animation, sticky bottom bar |
+| **Cart** | Swipe-to-delete, total bar with checkout button, styled quantity controls |
+| **Favorites** | Swipe-to-remove, soft shadow cards |
+| **Profile** | Settings-style layout with grouped sections and tinted icons |
+| **Login** | Glassmorphic card, gradient logo, fade + slide entrance animation |
+| **Splash** | Branded splash screen with app logo |
+| **Loading** | Shimmer pulse effect while products load |
+
+### Animations
+- **Hero Transitions**: product images between list and detail
+- **Scale Animation**: tap feedback on bottom nav icons
+- **Pill Indicator**: animated gradient indicator on the selected tab
+- **Animated Heart**: favorite icon scales in/out on toggle
+- **Page Transitions**: iOS-style (Cupertino) on all platforms
+- **Fade + Slide**: login screen entrance
 
 ---
 
-## نظام الـ Flavors
+## App Flavors
 
-الـ Flavors تسمح بتشغيل نفس التطبيق بإعدادات مختلفة بدون تعديل الكود:
+Flavors allow running the same app with different configurations without changing code:
 
-| Flavor | اسم التطبيق | شريط Debug | Base URL |
-|--------|-------------|------------|----------|
-| **dev** | Technica Dev | يظهر | `https://fakestoreapi.com` |
-| **prod** | Technica Task | مخفي | `https://fakestoreapi.com` |
+| Flavor | App Name | Debug Banner | Base URL |
+|--------|----------|--------------|----------|
+| **dev** | Technica Dev | Visible | `https://fakestoreapi.com` |
+| **prod** | Technica Task | Hidden | `https://fakestoreapi.com` |
 
-### ملفات الـ Flavors
+### Flavor Files
 
-| الملف | الوظيفة |
-|-------|---------|
-| `lib/main.dart` | نقطة الدخول الافتراضية (prod) |
-| `lib/main_dev.dart` | يشغّل التطبيق بفلافور **dev** |
-| `lib/main_prod.dart` | يشغّل التطبيق بفلافور **prod** |
-| `lib/core/env/app_env.dart` | تعريف الإعدادات لكل flavor |
+| File | Purpose |
+|------|---------|
+| `lib/main.dart` | Default entry point (prod) |
+| `lib/main_dev.dart` | Dev flavor entry point |
+| `lib/main_prod.dart` | Prod flavor entry point |
+| `lib/core/env/app_env.dart` | Flavor configuration |
 
-### تغيير إعدادات الـ Flavor
+### Customizing Flavors
 
-كل الإعدادات في ملف واحد `lib/core/env/app_env.dart`:
+All settings live in a single file — `lib/core/env/app_env.dart`:
 
 ```dart
 static const dev = AppEnvConfig(
   flavor: Flavor.dev,
-  baseUrl: 'https://staging-api.example.com',  // سيرفر التطوير
+  baseUrl: 'https://staging-api.example.com',  // Staging server
   appName: 'Technica Dev',
   showDebugBanner: true,
 );
 
 static const prod = AppEnvConfig(
   flavor: Flavor.prod,
-  baseUrl: 'https://api.example.com',          // سيرفر الإنتاج
+  baseUrl: 'https://api.example.com',          // Production server
   appName: 'Technica Task',
   showDebugBanner: false,
 );
 ```
 
-الـ DI (في `injection.dart`) يقرأ `AppEnv.current.baseUrl` ويمرّره لـ `DioClient` تلقائياً.
+The DI setup in `injection.dart` reads `AppEnv.current.baseUrl` and passes it to `DioClient` automatically.
 
 ---
 
-## طريقة التشغيل
+## Getting Started
 
-### المتطلبات
+### Prerequisites
 - Flutter SDK 3.10.8+
 - Dart SDK 3.10.8+
 
-### الخطوات
+### Steps
 
 ```bash
-# 1. استنساخ المشروع
+# 1. Clone the repository
 git clone <repo-url>
 cd technica_task
 
-# 2. تحميل المكتبات
+# 2. Install dependencies
 flutter pub get
 
-# 3. تشغيل التطبيق
-flutter run                              # prod (افتراضي)
+# 3. Run the app
+flutter run                              # prod (default)
 flutter run -t lib/main_dev.dart         # dev flavor
 flutter run -t lib/main_prod.dart        # prod flavor
 
-# 4. تشغيل الاختبارات
+# 4. Run tests
 flutter test
 ```
 
 ---
 
-## بيانات الديمو
+## Demo Credentials
 
-### حساب ديمو محلي (يعمل بدون إنترنت)
-| الحقل | القيمة |
-|-------|--------|
-| اسم المستخدم | `mohamed` |
-| كلمة المرور | `0000` |
+### Local Demo Account (works without internet)
+| Field | Value |
+|-------|-------|
+| Username | `mohamed` |
+| Password | `0000` |
 
-### حساب Fake Store API
-| الحقل | القيمة |
-|-------|--------|
-| اسم المستخدم | `mor_2314` |
-| كلمة المرور | `83r5^_` |
+### Fake Store API Account
+| Field | Value |
+|-------|-------|
+| Username | `mor_2314` |
+| Password | `83r5^_` |
 
-> الحساب المحلي يُنشئ توكن وهمي ويسجل الدخول مباشرة بدون استدعاء API.
+> The local demo account generates a dummy token and logs in immediately without calling the API.
 
 ---
 
-## الاختبارات (Testing)
+## Testing
 
-المشروع يحتوي على **29 اختبار** تغطي الـ Cubits والـ Repositories:
+The project includes **29 tests** covering Cubits and Repositories:
 
 ```
 test/
 ├── features/
 │   ├── auth/
 │   │   ├── cubit/
-│   │   │   └── auth_cubit_test.dart              # اختبارات AuthCubit
+│   │   │   └── auth_cubit_test.dart
 │   │   └── repository/
-│   │       └── auth_repository_impl_test.dart     # اختبارات AuthRepository
+│   │       └── auth_repository_impl_test.dart
 │   ├── cart/
 │   │   └── cubit/
-│   │       └── cart_cubit_test.dart               # اختبارات CartCubit
+│   │       └── cart_cubit_test.dart
 │   ├── favorites/
 │   │   ├── cubit/
-│   │   │   └── favorites_cubit_test.dart          # اختبارات FavoritesCubit
+│   │   │   └── favorites_cubit_test.dart
 │   │   └── repository/
-│   │       └── favorites_repository_impl_test.dart # اختبارات FavoritesRepository
+│   │       └── favorites_repository_impl_test.dart
 │   └── products/
 │       └── cubit/
-│           └── products_cubit_test.dart           # اختبارات ProductsCubit
+│           └── products_cubit_test.dart
 └── widget_test.dart
 ```
 
-**تشغيل الاختبارات:**
+**Running tests:**
 
 ```bash
-flutter test              # كل الاختبارات
-flutter test test/features/auth/   # اختبارات المصادقة فقط
+flutter test                         # All tests
+flutter test test/features/auth/     # Auth tests only
 ```
 
 ---
 
-## التعامل مع الأخطاء (Error Handling)
+## Error Handling
 
-التطبيق يستخدم نظام أخطاء مخصص (Custom Exceptions):
+The app uses a custom exception system:
 
-| نوع الخطأ | الاستخدام |
-|-----------|-----------|
-| `ServerException` | أخطاء السيرفر أو الشبكة |
-| `AuthException` | فشل تسجيل الدخول (بيانات خاطئة) |
-| `OfflineException` | لا يوجد اتصال بالإنترنت |
-| `TimeoutException` | انتهاء مهلة الاتصال |
-| `CacheException` | بيانات الـ Cache غير صالحة أو مفقودة |
+| Exception | Usage |
+|-----------|-------|
+| `ServerException` | Server or network errors |
+| `AuthException` | Login failure (invalid credentials) |
+| `OfflineException` | No internet connection |
+| `TimeoutException` | Connection timeout |
+| `CacheException` | Invalid or missing cached data |
 
-### تدفق الأخطاء
+### Error Flow
 
 ```
 API Error → DioClient (error mapping) → Repository → UseCase → Cubit → UI (SnackBar / Error State)
 ```
 
-- الـ `DioClient` يحوّل أخطاء Dio إلى `AppException`
-- الـ Cubit يلتقط الأخطاء ويصدر State مناسبة
-- الـ UI يعرض رسالة واضحة مع زر إعادة المحاولة
+- `DioClient` maps Dio errors to `AppException` subtypes
+- Cubits catch exceptions and emit the appropriate state
+- The UI displays a clear message with a retry button
 
 ---
 
 ## Dependency Injection
 
-التطبيق يستخدم **GetIt** لحقن التبعيات. كل التسجيلات في ملف واحد `lib/core/di/injection.dart`:
+The app uses **GetIt** for dependency injection. All registrations live in `lib/core/di/injection.dart`:
 
 ```
 Core (SharedPreferences, SecureStorage, DioClient, Connectivity)
@@ -477,8 +478,8 @@ UseCases
 Cubits
 ```
 
-- **LazySingleton**: للمكونات المشتركة (Repositories, DataSources, UseCases)
-- **Factory**: للـ Cubits (نسخة جديدة كل مرة)
+- **LazySingleton**: for shared components (Repositories, DataSources, UseCases)
+- **Factory**: for Cubits (new instance each time)
 
 ---
 

@@ -31,6 +31,7 @@ class _LoginViewState extends State<_LoginView>
   late final AnimationController _animController;
   late final Animation<double> _fadeIn;
   late final Animation<Offset> _slideIn;
+  String? _lastShownErrorMessage;
 
   @override
   void initState() {
@@ -51,6 +52,33 @@ class _LoginViewState extends State<_LoginView>
   void dispose() {
     _animController.dispose();
     super.dispose();
+  }
+
+  void _showErrorSnackBar(
+    BuildContext context,
+    String message,
+    ColorScheme colorScheme,
+  ) {
+    if (!context.mounted) return;
+    _lastShownErrorMessage = message;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        backgroundColor: colorScheme.error,
+        action: SnackBarAction(
+          label: 'OK',
+          textColor: colorScheme.onError,
+          onPressed: () {
+            ScaffoldMessenger.of(context).hideCurrentSnackBar();
+          },
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+      ),
+    );
   }
 
   @override
@@ -88,18 +116,20 @@ class _LoginViewState extends State<_LoginView>
           child: BlocConsumer<AuthCubit, AuthState>(
             listener: (context, state) {
               if (state is AuthStateError) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(state.message),
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                );
+                _showErrorSnackBar(context, state.message, colorScheme);
               }
             },
             builder: (context, state) {
+              if (state is AuthStateError &&
+                  state.message != _lastShownErrorMessage) {
+                _lastShownErrorMessage = state.message;
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (!mounted) return;
+                  _showErrorSnackBar(context, state.message, colorScheme);
+                });
+              } else if (state is! AuthStateError) {
+                _lastShownErrorMessage = null;
+              }
               if (state is AuthStateLoading) {
                 return Center(
                   child: Column(

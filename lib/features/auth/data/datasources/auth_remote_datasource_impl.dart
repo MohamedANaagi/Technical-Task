@@ -47,7 +47,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       }
       return token;
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401) {
+      final code = e.response?.statusCode;
+      if (code == 401 || code == 400 || code == 404) {
         throw const AuthException('Invalid email or password.');
       }
       rethrow;

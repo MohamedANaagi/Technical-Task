@@ -96,8 +96,10 @@ class _CartView extends StatelessWidget {
                 }
               }
 
-              return Column(
-                children: [
+              return SafeArea(
+                top: false,
+                child: Column(
+                  children: [
                   // Items count
                   Padding(
                     padding: const EdgeInsets.symmetric(
@@ -245,6 +247,7 @@ class _CartView extends StatelessWidget {
                     ),
                   ),
                 ],
+                ),
               );
             },
           );

@@ -57,6 +57,11 @@ class ProductsCubit extends Cubit<ProductsState> {
     if (list.isEmpty) {
       emit(const ProductsStateEmpty());
     } else {
+      print(
+        '[ProductsCubit] Successfully loaded ${list.length} products '
+        '(total: ${_allProducts.length}) '
+        '${isOffline ? '[FROM CACHE / OFFLINE]' : '[FROM API]'}',
+      );
       emit(
         ProductsStateLoaded(
           products: list,

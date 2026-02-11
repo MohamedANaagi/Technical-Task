@@ -15,6 +15,13 @@ class _LoginFormState extends State<LoginForm> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  bool _didAttemptSubmit = false;
+
+  static final _emailRegex = RegExp(
+    r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+  );
+  static const int _minUsernameLength = 3;
+  static const int _minPasswordLength = 4;
 
   @override
   void dispose() {
@@ -24,8 +31,18 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+    final trimmed = value?.trim() ?? '';
+    if (trimmed.isEmpty) {
+      return 'Email or username is required';
+    }
+    if (trimmed.contains('@')) {
+      if (!_emailRegex.hasMatch(trimmed)) {
+        return 'Please enter a valid email address';
+      }
+    } else {
+      if (trimmed.length < _minUsernameLength) {
+        return 'Username must be at least $_minUsernameLength characters';
+      }
     }
     return null;
   }
@@ -34,15 +51,21 @@ class _LoginFormState extends State<LoginForm> {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
+    if (value.length < _minPasswordLength) {
+      return 'Password must be at least $_minPasswordLength characters';
+    }
     return null;
   }
 
   void _submit() {
+    _didAttemptSubmit = true;
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthCubit>().login(
-        email: _emailController.text.trim(),
-        password: _passwordController.text,
-      );
+            email: _emailController.text.trim(),
+            password: _passwordController.text,
+          );
+    } else {
+      setState(() {});
     }
   }
 
@@ -53,6 +76,9 @@ class _LoginFormState extends State<LoginForm> {
 
     return Form(
       key: _formKey,
+      autovalidateMode: _didAttemptSubmit
+          ? AutovalidateMode.onUserInteraction
+          : AutovalidateMode.disabled,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

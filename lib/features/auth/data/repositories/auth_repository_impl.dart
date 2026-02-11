@@ -4,6 +4,20 @@ import '../../domain/repositories/auth_repository.dart';
 import '../datasources/auth_local_datasource.dart';
 import '../datasources/auth_remote_datasource.dart';
 
+// ═══════════════════════════════════════════════════════════════════════════════
+// AuthRepositoryImpl — تنفيذ مستودع المصادقة (يجمع Remote + Local)
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// العلاقات:
+//   • ينفّذ: AuthRepository (واجهة من domain).
+//   • يعتمد على: AuthRemoteDataSource، AuthLocalDataSource، AuthUser، AuthException.
+//   • يُستخدم من: GetIt — يُحقَن في LoginUseCase، LogoutUseCase، CheckAuthUseCase.
+//
+// تدفق login: التحقق من الحقول → Remote.login() → Local.saveToken() → AuthUser.
+// تدفق logout: Local.clearToken() فقط (لا استدعاء API).
+// تدفق getStoredAuth: Local.getToken() → AuthUser أو null.
+// ═══════════════════════════════════════════════════════════════════════════════
+
 class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this._remote, this._local);
   final AuthRemoteDataSource _remote;

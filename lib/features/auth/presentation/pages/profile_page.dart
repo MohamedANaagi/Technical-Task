@@ -113,8 +113,8 @@ class ProfilePage extends StatelessWidget {
                             value: isDark,
                             onChanged: (value) {
                               context.read<ThemeCubit>().setThemeMode(
-                                    value ? ThemeMode.dark : ThemeMode.light,
-                                  );
+                                value ? ThemeMode.dark : ThemeMode.light,
+                              );
                             },
                           ),
                           onTap: null,
@@ -190,6 +190,8 @@ class ProfilePage extends StatelessWidget {
     );
   }
 
+  /// يعرض حوار تأكيد تسجيل الخروج. عند الضغط على Sign Out يُستدعى
+  /// AuthCubit.logout() فيصبح الـ state Unauthenticated ويتم التوجيه لـ LoginPage.
   void _showSignOutDialog(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     showDialog(
@@ -218,6 +220,7 @@ class ProfilePage extends StatelessWidget {
 }
 
 // ── Settings Section ──────────────────────────────────────────────────────────
+/// عنوان قسم + قائمة من _SettingsTile داخل كارد.
 class _SettingsSection extends StatelessWidget {
   const _SettingsSection({required this.title, required this.children});
   final String title;
@@ -276,6 +279,7 @@ class _SettingsSection extends StatelessWidget {
 }
 
 // ── Settings Tile ─────────────────────────────────────────────────────────────
+/// صف إعداد واحد: أيقونة، عنوان، اختياريًا subtitle و trailing (مثل Switch أو Chevron).
 class _SettingsTile extends StatelessWidget {
   const _SettingsTile({
     required this.icon,
